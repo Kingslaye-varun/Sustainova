@@ -1,0 +1,606 @@
+{
+    "info": {
+        "name": "SUSTAINOVA API",
+        "description": "Complete API collection for SUSTAINOVA Smart Office PWA backend",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:5000/api",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "🔑 Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/auth/register",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Varun Rahatgaonkar\",\n  \"email\": \"varun@sustainova.in\",\n  \"password\": \"test1234\",\n  \"role\": \"employee\",\n  \"department\": \"IT Engineering\",\n  \"floor\": 12\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Register Admin",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/auth/register",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Aditya Mitra\",\n  \"email\": \"admin@sustainova.in\",\n  \"password\": \"admin1234\",\n  \"role\": \"admin\",\n  \"department\": \"Administration\",\n  \"floor\": 15\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Register Maintenance",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/auth/register",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Rajan Sharma\",\n  \"email\": \"maintenance@sustainova.in\",\n  \"password\": \"maint1234\",\n  \"role\": \"maintenance\",\n  \"department\": \"Facilities\",\n  \"floor\": 0\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const r = pm.response.json();",
+                                    "if (r.token) pm.collectionVariables.set('token', r.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/auth/login",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"varun@sustainova.in\",\n  \"password\": \"test1234\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Login as Admin",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const r = pm.response.json();",
+                                    "if (r.token) pm.collectionVariables.set('token', r.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/auth/login",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@sustainova.in\",\n  \"password\": \"admin1234\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get Me",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/auth/me",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/auth/logout",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "👥 Users (Admin)",
+            "item": [
+                {
+                    "name": "Get All Users",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/users",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Search Users",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/users?search=varun",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Filter by Role",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/users?role=maintenance",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🎫 Tickets",
+            "item": [
+                {
+                    "name": "Create Ticket",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/tickets",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"AC not cooling in Meeting Room 3B\",\n  \"description\": \"The split AC on floor 8 room 3B has been blowing warm air since morning. Temperature inside is 28°C.\",\n  \"category\": \"facilities\",\n  \"priority\": \"high\",\n  \"location\": \"Floor 8, Meeting Room 3B\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Create IT Ticket",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/tickets",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"WiFi dropping on Floor 12\",\n  \"description\": \"WiFi connection drops every 10 minutes on floor 12 east wing. Happens on all devices.\",\n  \"category\": \"it\",\n  \"priority\": \"medium\",\n  \"location\": \"Floor 12, East Wing\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Get My Tickets",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/tickets",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get Ticket Stats (Admin)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/tickets/stats",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Filter Tickets by Status",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/tickets?status=open",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Update Ticket (Admin)",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{base_url}}/tickets/TICKET_ID_HERE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"in_progress\",\n  \"notes\": \"Tech team dispatched to investigate\"\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🚗 Parking",
+            "item": [
+                {
+                    "name": "Seed Parking Data (Admin - run once)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/parking/seed",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get Parking Stats",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/parking/stats",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get All Slots",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/parking",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get Floor B1 Slots",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/parking?floor=B1",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Reserve a Slot (e.g. B1-A5)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/parking/B1-A5/reserve",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"vehicleNumber\": \"MH01AB1234\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Free a Slot",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "{{base_url}}/parking/B1-A5/reserve",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🚴 Gym",
+            "item": [
+                {
+                    "name": "Get All Cycles (auto-seeds 40)",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/gym/cycles",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Get Energy Stats",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/gym/energy",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Update Cycle Status (IoT Simulation)",
+                    "request": {
+                        "method": "PATCH",
+                        "url": "{{base_url}}/gym/cycles/C01",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"occupied\": true,\n  \"watts\": 145\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Free Cycle C01",
+                    "request": {
+                        "method": "PATCH",
+                        "url": "{{base_url}}/gym/cycles/C01",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"occupied\": false,\n  \"watts\": 0\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🔧 Maintenance",
+            "item": [
+                {
+                    "name": "Get All Tasks",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/maintenance",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Create Task",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/maintenance",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Replace BLDC fan on Floor 14\",\n  \"description\": \"Fan bearing is making noise, needs replacement\",\n  \"location\": \"Floor 14, Zone C, Room 14C-02\",\n  \"issueType\": \"hvac\",\n  \"priority\": \"high\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Update Task to In Progress",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{base_url}}/maintenance/TASK_ID_HERE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"in_progress\",\n  \"notes\": \"Parts ordered, work starts tomorrow\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "Complete Task",
+                    "request": {
+                        "method": "PUT",
+                        "url": "{{base_url}}/maintenance/TASK_ID_HERE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"completed\",\n  \"notes\": \"Fan replaced. Tested and working fine.\"\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "📢 Announcements",
+            "item": [
+                {
+                    "name": "Get Announcements",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/announcements",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "Create Announcement (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "url": "{{base_url}}/announcements",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Fire Drill — 10th March\",\n  \"message\": \"Building-wide fire drill on 10th March at 3 PM. Please follow evacuation routes.\",\n  \"target\": \"all\"\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "💚 Health Check",
+            "item": [
+                {
+                    "name": "API Health",
+                    "request": {
+                        "method": "GET",
+                        "url": "{{base_url}}/health"
+                    }
+                }
+            ]
+        }
+    ]
+}

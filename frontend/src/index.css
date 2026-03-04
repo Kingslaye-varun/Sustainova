@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@theme {
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-family-display: 'Space Grotesk', system-ui, sans-serif;
+
+  /* Brand colors */
+  --color-sn-teal: #00C9B1;
+  --color-sn-gold: #F5B800;
+  --color-sn-navy: #0A1628;
+  --color-sn-surface: #0F2040;
+  --color-sn-card: #132845;
+  --color-sn-border: rgba(0, 201, 177, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: #0A1628;
+  color: #E8F4F8;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A1628;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 201, 177, 0.3);
+  border-radius: 2px;
+}
+
+/* Glow animations */
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(0, 201, 177, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(0, 201, 177, 0.6);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes bounce-dot {
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-glow {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #132845 25%, #1a3358 50%, #132845 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.bounce-dot-1 {
+  animation: bounce-dot 1.2s infinite;
+}
+
+.bounce-dot-2 {
+  animation: bounce-dot 1.2s infinite 0.2s;
+}
+
+.bounce-dot-3 {
+  animation: bounce-dot 1.2s infinite 0.4s;
+}
+
+/* Glass card */
+.glass {
+  background: rgba(19, 40, 69, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 201, 177, 0.12);
+}
