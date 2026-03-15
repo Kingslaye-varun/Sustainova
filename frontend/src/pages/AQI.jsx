@@ -26,6 +26,8 @@ const CARBON_HISTORY = [
     { month: 'Jan', co2: 15 }, { month: 'Feb', co2: 12 }, { month: 'Mar', co2: 8 },
 ];
 
+const TOOLTIP_STYLE = { background: '#132845', border: '1px solid rgba(0,201,177,0.2)', borderRadius: 8, color: '#E8F4F8', fontSize: 12 };
+
 const AQI = () => {
     const [tab, setTab] = useState('aqi');
     const [mode, setMode] = useState('walk');
@@ -41,13 +43,21 @@ const AQI = () => {
         setResult({ kg, dist, mode, icon: MODES.find(m => m.id === mode)?.icon });
     };
 
+    const resultColor = result
+        ? parseFloat(result.kg) === 0 ? 'var(--sn-teal)'
+            : parseFloat(result.kg) < 0.5 ? 'var(--sn-green)'
+                : parseFloat(result.kg) < 1.5 ? 'var(--sn-gold)'
+                    : 'var(--sn-red)'
+        : 'var(--sn-teal)';
+
     return (
         <Layout>
             <PageHeader label="🌍 Environment" title="AQI & Carbon Footprint" subtitle="Track air quality & your carbon impact" />
 
-            <div className="flex gap-1 bg-[#132845] rounded-full p-1 mb-4">
+            {/* Tab toggle */}
+            <div className="sn-tabs">
                 {['aqi', 'carbon'].map(t => (
-                    <button key={t} onClick={() => setTab(t)} className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all ${tab === t ? 'bg-[#00C9B1] text-[#0A1628]' : 'text-[#4A6580] hover:text-[#8BA3B8]'}`}>
+                    <button key={t} onClick={() => setTab(t)} className={`sn-tabs__tab ${tab === t ? 'sn-tabs__tab--active' : ''}`}>
                         {t === 'aqi' ? '🌿 Air Quality' : '🚗 Carbon Tracker'}
                     </button>
                 ))}
@@ -55,38 +65,40 @@ const AQI = () => {
 
             {tab === 'aqi' && (
                 <>
-                    <Card className="mb-4 bg-[rgba(46,204,113,0.06)] border-[rgba(46,204,113,0.25)]">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-['Space_Grotesk'] font-semibold">🌿 Air Quality Index</h3>
+                    {/* AQI overview */}
+                    <Card style={{ background: 'rgba(46,204,113,0.06)', border: '1px solid rgba(46,204,113,0.25)', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                            <p className="sn-section-title" style={{ marginBottom: 0 }}>🌿 Air Quality Index</p>
                             <Badge variant="green">Good</Badge>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div className="text-center">
-                                <div className="font-['Space_Grotesk'] text-5xl font-bold text-[#2ECC71]">{indoorAqi}</div>
-                                <div className="text-[10px] font-medium text-[#4A6580] uppercase tracking-wide mt-1">Indoor AQI</div>
-                                <div className="text-xs text-[#2ECC71] mt-0.5">✅ Excellent</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', fontWeight: 700, color: 'var(--sn-green)' }}>{indoorAqi}</div>
+                                <div style={{ fontSize: '0.625rem', fontWeight: 600, color: 'var(--sn-dim)', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: '0.25rem' }}>Indoor AQI</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--sn-green)', marginTop: '0.25rem' }}>✅ Excellent</div>
                             </div>
-                            <div className="text-center">
-                                <div className="font-['Space_Grotesk'] text-5xl font-bold text-[#F5B800]">{outdoorAqi}</div>
-                                <div className="text-[10px] font-medium text-[#4A6580] uppercase tracking-wide mt-1">Outdoor AQI</div>
-                                <div className="text-xs text-[#F5B800] mt-0.5">⚠️ Moderate</div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', fontWeight: 700, color: 'var(--sn-gold)' }}>{outdoorAqi}</div>
+                                <div style={{ fontSize: '0.625rem', fontWeight: 600, color: 'var(--sn-dim)', textTransform: 'uppercase', letterSpacing: '0.07em', marginTop: '0.25rem' }}>Outdoor AQI</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--sn-gold)', marginTop: '0.25rem' }}>⚠️ Moderate</div>
                             </div>
                         </div>
-                        <div className="bg-[#0d1e35] rounded-xl px-4 py-2.5 text-sm text-[#8BA3B8]">
-                            💡 <strong className="text-[#E8F4F8]">Tip:</strong> Indoor air is excellent — our green facade system is actively purifying air on your floor.
+                        <div className="sn-tip">
+                            💡 <strong style={{ color: 'var(--sn-text)' }}>Tip:</strong> Indoor air is excellent — our green facade system is actively purifying air on your floor.
                         </div>
                     </Card>
 
+                    {/* Pollutants */}
                     <Card>
-                        <h3 className="font-['Space_Grotesk'] font-semibold mb-4">🔬 Pollutant Breakdown</h3>
-                        {POLLUTANTS.map(p => (
-                            <div key={p.name} className="mb-3 last:mb-0">
-                                <div className="flex justify-between text-sm mb-1">
-                                    <span className="font-medium">{p.name}</span>
-                                    <span className="font-semibold" style={{ color: p.color }}>{p.value} {p.unit} — {p.status}</span>
+                        <p className="sn-section-title">🔬 Pollutant Breakdown</p>
+                        {POLLUTANTS.map((p, i) => (
+                            <div key={p.name} style={{ marginBottom: i < POLLUTANTS.length - 1 ? '0.875rem' : 0 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '0.375rem' }}>
+                                    <span style={{ fontWeight: 500 }}>{p.name}</span>
+                                    <span style={{ fontWeight: 600, color: p.color }}>{p.value} {p.unit} — {p.status}</span>
                                 </div>
-                                <div className="h-1.5 bg-[#0d1e35] rounded-full overflow-hidden">
-                                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (p.value / p.max) * 100)}%`, background: p.color }} />
+                                <div className="sn-progress-track" style={{ marginBottom: 0 }}>
+                                    <div style={{ height: '100%', borderRadius: 99, background: p.color, width: `${Math.min(100, (p.value / p.max) * 100)}%`, transition: 'width 0.5s ease' }} />
                                 </div>
                             </div>
                         ))}
@@ -96,14 +108,13 @@ const AQI = () => {
 
             {tab === 'carbon' && (
                 <>
-                    <Card className="mb-4">
-                        <h3 className="font-['Space_Grotesk'] font-semibold mb-3">🚗 Log Today's Commute</h3>
-                        <div className="grid grid-cols-3 gap-2 mb-4">
+                    <Card style={{ marginBottom: '1rem' }}>
+                        <p className="sn-section-title">🚗 Log Today's Commute</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
                             {MODES.map(m => (
-                                <div key={m.id} onClick={() => setMode(m.id)}
-                                    className={`rounded-xl p-2.5 text-center cursor-pointer border-2 transition-all ${mode === m.id ? 'border-[#00C9B1] bg-[rgba(0,201,177,0.1)]' : 'border-[rgba(0,201,177,0.1)] bg-[#0d1e35] hover:border-[rgba(0,201,177,0.3)]'}`}>
-                                    <div className="text-xl mb-0.5">{m.icon}</div>
-                                    <div className="text-[10px] font-semibold text-[#8BA3B8]">{m.label}</div>
+                                <div key={m.id} onClick={() => setMode(m.id)} className={`sn-mode-card ${mode === m.id ? 'sn-mode-card--active' : ''}`}>
+                                    <div style={{ fontSize: '1.25rem', marginBottom: '0.25rem' }}>{m.icon}</div>
+                                    <div style={{ fontSize: '0.625rem', fontWeight: 600, color: 'var(--sn-muted)' }}>{m.label}</div>
                                 </div>
                             ))}
                         </div>
@@ -111,26 +122,36 @@ const AQI = () => {
                         <Button fullWidth onClick={calculate}>Calculate My Footprint 🌱</Button>
 
                         {result && (
-                            <div className="mt-4 p-4 bg-[#0d1e35] rounded-2xl text-center animate-[fadeIn_0.3s_ease]">
-                                <div className="text-3xl mb-1">{result.icon}</div>
-                                <div className={`font-['Space_Grotesk'] text-3xl font-bold ${parseFloat(result.kg) === 0 ? 'text-[#00C9B1]' : parseFloat(result.kg) < 0.5 ? 'text-[#2ECC71]' : parseFloat(result.kg) < 1.5 ? 'text-[#F5B800]' : 'text-[#FF4757]'}`}>
+                            <div className="sn-fade-in" style={{
+                                marginTop: '1rem',
+                                padding: '1rem',
+                                background: 'var(--sn-dark)',
+                                borderRadius: '1rem',
+                                textAlign: 'center',
+                            }}>
+                                <div style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>{result.icon}</div>
+                                <div style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 700, color: resultColor }}>
                                     {parseFloat(result.kg) === 0 ? '0 kg CO₂' : `${result.kg} kg CO₂`}
                                 </div>
-                                <div className="text-[#8BA3B8] text-sm mt-1">{result.dist} km by {result.mode}</div>
-                                {parseFloat(result.kg) === 0 && <div className="text-[#00C9B1] text-sm mt-2">🌟 Zero emission! Sustainability hero!</div>}
-                                <Button variant="ghost" size="sm" className="mt-3" onClick={() => alert('Trip logged! ✅')}>Log This Trip 📝</Button>
+                                <div style={{ color: 'var(--sn-muted)', fontSize: '0.875rem', marginTop: '0.25rem' }}>{result.dist} km by {result.mode}</div>
+                                {parseFloat(result.kg) === 0 && (
+                                    <div style={{ color: 'var(--sn-teal)', fontSize: '0.875rem', marginTop: '0.5rem' }}>🌟 Zero emission! Sustainability hero!</div>
+                                )}
+                                <Button variant="ghost" size="sm" style={{ marginTop: '0.75rem' }} onClick={() => alert('Trip logged! ✅')}>
+                                    Log This Trip 📝
+                                </Button>
                             </div>
                         )}
                     </Card>
 
                     <Card>
-                        <h3 className="font-['Space_Grotesk'] font-semibold mb-3">📊 My Monthly Carbon (kg CO₂)</h3>
+                        <p className="sn-section-title">📊 My Monthly Carbon (kg CO₂)</p>
                         <ResponsiveContainer width="100%" height={130}>
                             <BarChart data={CARBON_HISTORY} barSize={22}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,201,177,0.06)" />
-                                <XAxis dataKey="month" tick={{ fill: '#8BA3B8', fontSize: 10 }} />
-                                <YAxis tick={{ fill: '#8BA3B8', fontSize: 10 }} />
-                                <Tooltip contentStyle={{ background: '#132845', border: '1px solid rgba(0,201,177,0.2)', borderRadius: 8, color: '#E8F4F8' }} />
+                                <XAxis dataKey="month" tick={{ fill: '#8BA3B8', fontSize: 10 }} axisLine={false} tickLine={false} />
+                                <YAxis tick={{ fill: '#8BA3B8', fontSize: 10 }} axisLine={false} tickLine={false} width={24} />
+                                <Tooltip contentStyle={TOOLTIP_STYLE} />
                                 <Bar dataKey="co2" fill="rgba(0,201,177,0.7)" name="CO₂ (kg)" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>

@@ -4,6 +4,8 @@ import Layout from '../components/layout/Layout';
 import { gymAPI } from '../services/api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
+const TOOLTIP_STYLE = { background: '#132845', border: '1px solid rgba(0,201,177,0.2)', borderRadius: 8, color: '#E8F4F8', fontSize: 12 };
+
 const Gym = () => {
     const [cycles, setCycles] = useState([]);
     const [energy, setEnergy] = useState(null);
@@ -11,24 +13,22 @@ const Gym = () => {
 
     const fetchData = () => {
         Promise.all([gymAPI.getCycles(), gymAPI.getEnergy()])
-            .then(([cRes, eRes]) => {
-                setCycles(cRes.data.cycles);
-                setEnergy(eRes.data.stats);
-            })
+            .then(([cRes, eRes]) => { setCycles(cRes.data.cycles); setEnergy(eRes.data.stats); })
             .catch(console.error)
             .finally(() => setLoading(false));
     };
 
     useEffect(() => {
         fetchData();
-        // Live update every 5 seconds
         const interval = setInterval(fetchData, 5000);
         return () => clearInterval(interval);
     }, []);
 
     if (loading) return (
         <Layout>
-            <div className="flex justify-center items-center h-64"><Spinner size="lg" /></div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '16rem' }}>
+                <Spinner size="lg" />
+            </div>
         </Layout>
     );
 
@@ -39,46 +39,49 @@ const Gym = () => {
             <PageHeader label="🚴 Gym Energy" title="Cycle Power Station" subtitle="Your pedaling powers the building ⚡" />
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-                <StatCard icon="⚡" value={<span className="text-[#F5B800]">{energy?.todayKwh || '—'}<span className="text-xs font-normal"> kWh</span></span>} label="Today" variant="gold" />
-                <StatCard icon="📅" value={<span className="text-[#00C9B1]">{energy?.monthKwh || '—'}<span className="text-xs font-normal"> kWh</span></span>} label="This Month" variant="teal" />
-                <StatCard icon="📆" value={<span className="text-[#2ECC71]">{energy?.yearMwh || '—'}<span className="text-xs font-normal"> MWh</span></span>} label="This Year" variant="green" />
-                <StatCard icon="🌟" value={<span className="text-[#F5B800]">{active}<span className="text-sm font-normal">/{cycles.length}</span></span>} label="Active Now" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+                <StatCard icon="⚡" value={<span style={{ color: 'var(--sn-gold)' }}>{energy?.todayKwh || '—'}<span style={{ fontSize: '0.75rem', fontWeight: 400 }}> kWh</span></span>} label="Today" variant="gold" />
+                <StatCard icon="📅" value={<span style={{ color: 'var(--sn-teal)' }}>{energy?.monthKwh || '—'}<span style={{ fontSize: '0.75rem', fontWeight: 400 }}> kWh</span></span>} label="This Month" variant="teal" />
+                <StatCard icon="📆" value={<span style={{ color: 'var(--sn-green)' }}>{energy?.yearMwh || '—'}<span style={{ fontSize: '0.75rem', fontWeight: 400 }}> MWh</span></span>} label="This Year" variant="green" />
+                <StatCard icon="🌟" value={<span style={{ color: 'var(--sn-gold)' }}>{active}<span style={{ fontSize: '0.875rem', fontWeight: 400 }}>/{cycles.length}</span></span>} label="Active Now" />
             </div>
 
             {/* Fun fact */}
-            <Card className="bg-[rgba(245,184,0,0.06)] border-[rgba(245,184,0,0.25)] mb-4 text-center py-5">
-                <div className="text-3xl mb-1">💡</div>
-                <p className="text-[#8BA3B8] font-medium mb-1">Today's cycling powered</p>
-                <p className="font-['Space_Grotesk'] text-2xl font-bold text-[#F5B800]">
+            <Card style={{
+                background: 'rgba(245,184,0,0.06)',
+                border: '1px solid rgba(245,184,0,0.25)',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                padding: '1.25rem 1rem',
+            }}>
+                <div style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>💡</div>
+                <p style={{ color: 'var(--sn-muted)', fontWeight: 500, marginBottom: '0.25rem' }}>Today's cycling powered</p>
+                <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--sn-gold)' }}>
                     {energy?.lightbulbsEquivalent || 42} lightbulbs
                 </p>
-                <p className="text-[#4A6580] text-xs mt-1">for 1 hour each!</p>
+                <p style={{ color: 'var(--sn-dim)', fontSize: '0.75rem', marginTop: '0.25rem' }}>for 1 hour each!</p>
             </Card>
 
-            {/* Live cycles grid */}
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="font-['Space_Grotesk'] font-semibold">🚴 Cycle Status (Live)</h3>
+            {/* Cycles grid */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <p className="sn-section-title" style={{ marginBottom: 0 }}>🚴 Cycle Status (Live)</p>
                 <Badge variant="red">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#FF4757] animate-pulse inline-block mr-1" />
+                    <span className="sn-pulse-dot sn-pulse" style={{ background: 'var(--sn-red)', marginRight: '0.25rem' }} />
                     {active} active
                 </Badge>
             </div>
-            <Card className="mb-4">
-                <div className="grid grid-cols-5 gap-2.5 justify-items-center">
+            <Card style={{ marginBottom: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '0.625rem', justifyItems: 'center' }}>
                     {cycles.map(cycle => (
-                        <div key={cycle.cycleId} className="flex flex-col items-center gap-1">
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl border-2 transition-all ${cycle.occupied
-                                    ? 'bg-[rgba(255,71,87,0.12)] border-[#FF4757] animate-pulse shadow-[0_0_8px_rgba(255,71,87,0.3)]'
-                                    : 'bg-[rgba(46,204,113,0.08)] border-[rgba(46,204,113,0.4)]'
-                                }`}>
+                        <div key={cycle.cycleId} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <div className={`sn-cycle ${cycle.occupied ? 'sn-cycle--active sn-pulse' : 'sn-cycle--free'}`}>
                                 🚴
                             </div>
-                            <span className={`text-[9px] font-bold leading-none ${cycle.occupied ? 'text-[#FF4757]' : 'text-[#2ECC71]'}`}>
+                            <span style={{ fontSize: '0.5625rem', fontWeight: 700, color: cycle.occupied ? 'var(--sn-red)' : 'var(--sn-green)', lineHeight: 1 }}>
                                 {cycle.cycleId}
                             </span>
                             {cycle.occupied && cycle.watts > 0 && (
-                                <span className="text-[8px] text-[#F5B800] leading-none">{cycle.watts}W</span>
+                                <span style={{ fontSize: '0.5rem', color: 'var(--sn-gold)', lineHeight: 1 }}>{cycle.watts}W</span>
                             )}
                         </div>
                     ))}
@@ -87,13 +90,13 @@ const Gym = () => {
 
             {/* Monthly chart */}
             <Card>
-                <h3 className="font-['Space_Grotesk'] font-semibold mb-3">📈 Monthly Energy (kWh)</h3>
+                <p className="sn-section-title">📈 Monthly Energy (kWh)</p>
                 <ResponsiveContainer width="100%" height={130}>
                     <BarChart data={energy?.monthlyChart || []} barSize={20}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,201,177,0.06)" />
-                        <XAxis dataKey="month" tick={{ fill: '#8BA3B8', fontSize: 10 }} />
-                        <YAxis tick={{ fill: '#8BA3B8', fontSize: 10 }} />
-                        <Tooltip contentStyle={{ background: '#132845', border: '1px solid rgba(0,201,177,0.2)', borderRadius: 8, color: '#E8F4F8' }} />
+                        <XAxis dataKey="month" tick={{ fill: '#8BA3B8', fontSize: 10 }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fill: '#8BA3B8', fontSize: 10 }} axisLine={false} tickLine={false} width={28} />
+                        <Tooltip contentStyle={TOOLTIP_STYLE} />
                         <Bar dataKey="kwh" fill="rgba(245,184,0,0.7)" name="Energy (kWh)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>

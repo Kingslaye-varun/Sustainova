@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, Badge, Button, PageHeader, StatCard, TabRow, StatusChip, Spinner, EmptyState } from '../components/ui';
 import Layout from '../components/layout/Layout';
+import { useAuth } from '../context/AuthContext';
 import { parkingAPI } from '../services/api';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
@@ -15,14 +16,9 @@ const TRAFFIC_DATA = [
     { hour: '6PM', entries: 20, exits: 200 },
 ];
 
-const SLOT_COLORS = {
-    free: 'bg-[#2ECC71] shadow-[0_0_8px_rgba(46,204,113,0.5)]',
-    occupied: 'bg-[#FF4757]',
-    reserved: 'bg-[#F5B800]',
-    disabled: 'bg-[#4A6580] opacity-40',
-};
-
 const Parking = () => {
+    const { user } = useAuth();
+    const canSeed = user?.role === 'admin' || user?.role === 'maintenance';
     const [activeFloor, setActiveFloor] = useState('B1');
     const [stats, setStats] = useState(null);
     const [slots, setSlots] = useState([]);
@@ -51,29 +47,22 @@ const Parking = () => {
             await parkingAPI.seed();
             fetchStats();
             fetchSlots(activeFloor);
-        } catch (e) {
-            console.error('Seed error:', e.response?.data?.message);
-        } finally { setSeeding(false); }
+        } catch (e) { console.error(e.response?.data?.message); }
+        finally { setSeeding(false); }
     };
 
     const handleReserve = async (slot) => {
         if (slot.status !== 'free') return;
-        try {
-            await parkingAPI.reserve(slot.slotId, {});
-            fetchSlots(activeFloor);
-            fetchStats();
-            setSelected(null);
-        } catch (e) { console.error(e); }
+        try { await parkingAPI.reserve(slot.slotId, {}); fetchSlots(activeFloor); fetchStats(); setSelected(null); }
+        catch (e) { console.error(e); }
     };
 
     const handleFree = async (slot) => {
-        try {
-            await parkingAPI.free(slot.slotId);
-            fetchSlots(activeFloor);
-            fetchStats();
-            setSelected(null);
-        } catch (e) { console.error(e); }
+        try { await parkingAPI.free(slot.slotId); fetchSlots(activeFloor); fetchStats(); setSelected(null); }
+        catch (e) { console.error(e); }
     };
+
+    const TOOLTIP_STYLE = { background: '#132845', border: '1px solid rgba(0,201,177,0.2)', borderRadius: 8, color: '#E8F4F8', fontSize: 12 };
 
     return (
         <Layout>
@@ -81,14 +70,14 @@ const Parking = () => {
 
             {/* Stats */}
             {stats ? (
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                    <StatCard icon="🟢" value={<span className="text-[#2ECC71]">{stats.free}</span>} label="Free" variant="green" />
-                    <StatCard icon="🔴" value={<span className="text-[#FF4757]">{stats.occupied}</span>} label="Occupied" variant="red" />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+                    <StatCard icon="🟢" value={<span style={{ color: 'var(--sn-green)' }}>{stats.free}</span>} label="Free" variant="green" />
+                    <StatCard icon="🔴" value={<span style={{ color: 'var(--sn-red)' }}>{stats.occupied}</span>} label="Occupied" variant="red" />
                     <StatCard icon="📊" value={stats.total} label="Total" />
                 </div>
             ) : (
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                    {[...Array(3)].map((_, i) => <div key={i} className="h-20 animate-shimmer rounded-2xl" />)}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+                    {[...Array(3)].map((_, i) => <div key={i} className="sn-skeleton" style={{ height: '5rem' }} />)}
                 </div>
             )}
 
@@ -100,35 +89,37 @@ const Parking = () => {
             />
 
             {/* Legend */}
-            <div className="flex gap-4 mb-3 text-xs text-[#8BA3B8]">
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.75rem', fontSize: '0.75rem', color: 'var(--sn-muted)' }}>
                 {[['#2ECC71', 'Free'], ['#FF4757', 'Occupied'], ['#F5B800', 'Reserved'], ['#4A6580', 'Disabled']].map(([c, l]) => (
-                    <span key={l} className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-sm inline-block" style={{ background: c }} />
+                    <span key={l} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                        <span style={{ width: 10, height: 10, borderRadius: 3, background: c, display: 'inline-block' }} />
                         {l}
                     </span>
                 ))}
             </div>
 
-            {/* Grid */}
-            <Card className="mb-4">
-                <p className="font-['Space_Grotesk'] font-semibold mb-3">🅿️ Floor {activeFloor}</p>
+            {/* Slot grid */}
+            <Card style={{ marginBottom: '1rem' }}>
+                <p className="sn-section-title">🅿️ Floor {activeFloor}</p>
                 {loading ? (
-                    <div className="flex justify-center py-8"><Spinner /></div>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}><Spinner /></div>
                 ) : slots.length === 0 ? (
-                    <div className="text-center py-6">
-                        <p className="text-[#8BA3B8] text-sm mb-3">No parking data yet.</p>
-                        <Button onClick={handleSeed} variant="ghost" size="sm" disabled={seeding}>
-                            {seeding ? <Spinner size="sm" /> : '🌱 Seed Parking Data'}
-                        </Button>
+                    <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+                        <p style={{ color: 'var(--sn-muted)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>No parking data yet.</p>
+                        {canSeed && (
+                            <Button onClick={handleSeed} variant="ghost" size="sm" disabled={seeding}>
+                                {seeding ? <Spinner size="sm" /> : '🌱 Seed Parking Data'}
+                            </Button>
+                        )}
                     </div>
                 ) : (
-                    <div className="grid gap-1.5" style={{ gridTemplateColumns: 'repeat(8, 1fr)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8,1fr)', gap: '0.375rem' }}>
                         {slots.map(slot => (
                             <div
                                 key={slot.slotId}
                                 title={`${slot.slotId} — ${slot.status}`}
                                 onClick={() => slot.status !== 'disabled' && setSelected(slot)}
-                                className={`aspect-square rounded-[5px] flex items-center justify-center text-[0.45rem] font-bold text-black/70 cursor-pointer transition-transform hover:scale-110 ${SLOT_COLORS[slot.status]}`}
+                                className={`sn-slot sn-slot--${slot.status}`}
                             >
                                 {slot.slotId.split('-')[1]}
                             </div>
@@ -137,21 +128,17 @@ const Parking = () => {
                 )}
             </Card>
 
-            {/* Selected slot info */}
+            {/* Selected slot */}
             {selected && (
-                <Card className="mb-4 border-[rgba(0,201,177,0.3)]">
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-['Space_Grotesk'] font-bold text-lg">{selected.slotId}</h3>
+                <Card style={{ marginBottom: '1rem', borderColor: 'rgba(0,201,177,0.3)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.125rem' }}>{selected.slotId}</h3>
                         <StatusChip status={selected.status} />
                     </div>
-                    <p className="text-[#8BA3B8] text-sm mb-3">Floor {activeFloor}</p>
-                    <div className="flex gap-2">
-                        {selected.status === 'free' && (
-                            <Button onClick={() => handleReserve(selected)} size="sm">🅿️ Reserve</Button>
-                        )}
-                        {selected.status === 'reserved' && (
-                            <Button onClick={() => handleFree(selected)} variant="ghost" size="sm">🟢 Free Slot</Button>
-                        )}
+                    <p style={{ color: 'var(--sn-muted)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>Floor {activeFloor}</p>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {selected.status === 'free' && <Button onClick={() => handleReserve(selected)} size="sm">🅿️ Reserve</Button>}
+                        {selected.status === 'reserved' && <Button onClick={() => handleFree(selected)} variant="ghost" size="sm">🟢 Free Slot</Button>}
                         <Button onClick={() => setSelected(null)} variant="outline" size="sm">Close ✕</Button>
                     </div>
                 </Card>
@@ -159,13 +146,13 @@ const Parking = () => {
 
             {/* Traffic chart */}
             <Card>
-                <p className="font-['Space_Grotesk'] font-semibold mb-3">📊 Today's Traffic</p>
+                <p className="sn-section-title">📊 Today's Traffic</p>
                 <ResponsiveContainer width="100%" height={130}>
                     <BarChart data={TRAFFIC_DATA} barSize={8} barGap={2}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,201,177,0.06)" />
-                        <XAxis dataKey="hour" tick={{ fill: '#8BA3B8', fontSize: 9 }} />
-                        <YAxis tick={{ fill: '#8BA3B8', fontSize: 9 }} />
-                        <Tooltip contentStyle={{ background: '#132845', border: '1px solid rgba(0,201,177,0.2)', borderRadius: 8, color: '#E8F4F8' }} />
+                        <XAxis dataKey="hour" tick={{ fill: '#8BA3B8', fontSize: 9 }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fill: '#8BA3B8', fontSize: 9 }} axisLine={false} tickLine={false} width={24} />
+                        <Tooltip contentStyle={TOOLTIP_STYLE} />
                         <Bar dataKey="entries" fill="rgba(0,201,177,0.7)" name="Entries" radius={[3, 3, 0, 0]} />
                         <Bar dataKey="exits" fill="rgba(255,71,87,0.6)" name="Exits" radius={[3, 3, 0, 0]} />
                     </BarChart>

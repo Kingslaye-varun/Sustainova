@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Auto-generate unique User ID before save
-userSchema.pre('save', async function (next) {
+userSchema.pre('save', async function () {
     if (this.isNew) {
         const count = await mongoose.model('User').countDocuments();
         this.userId = `SN-2026-${String(count + 1).padStart(5, '0')}`;
@@ -30,7 +30,6 @@ userSchema.pre('save', async function (next) {
         this.password = await bcrypt.hash(this.password, salt);
         console.log(`🔒 Password hashed for user: ${this.email}`);
     }
-    next();
 });
 
 // Compare password method

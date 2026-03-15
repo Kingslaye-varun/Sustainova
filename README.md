@@ -1,283 +1,303 @@
-# 🏢 SUSTAINOVA — Smart Office Building PWA
+# 🏢 SUSTAINOVA — Smart Net-Zero Office Building
 
-> **Solar Decathlon India · TATA Realty**  
-> Progressive Web App for SUSTAINOVA — a Net-Zero Smart Commercial Office Building in Ghansoli, Navi Mumbai.  
-> Team: VESCOA (Architecture) + VESIT (IT)
+> **Solar Decathlon India 2026** · VESCOA Architecture + VESIT IT · TATA Realty  
+> Ghansoli, Navi Mumbai
 
----
-
-## 📸 Screenshots
-
-| Login | Dashboard | Parking Map |
-|-------|-----------|-------------|
-| Role-based auth | Live stats + charts | Real-time slot grid |
+A full-stack Progressive Web App for managing a smart, net-zero office building — smart parking, gym energy generation, AQI monitoring, gate pass management, and an AI health assistant powered by **Google Gemini**.
 
 ---
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js v18+
-- MongoDB (local or Atlas)
-
-### 1. Clone the repo
-```bash
-git clone https://github.com/YOUR_USERNAME/sustainova.git
-cd sustainova
-```
-
-### 2. Setup Backend
-```bash
-cd backend
-cp .env.example .env
-# Edit .env and paste your MONGO_URI
-npm install
-npm run dev
-```
-
-### 3. Setup Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open `http://localhost:5173` 🎉
-
----
-
-## 📁 Project Structure
+## 🗂️ Project Structure
 
 ```
 sustainova/
-├── frontend/                  # React + Vite + Tailwind CSS v4
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── layout/        # Header, BottomNav, Layout
-│   │   │   └── ui/            # Card, Badge, Button, Input, etc.
-│   │   ├── pages/             # One file per page/feature
-│   │   │   ├── Login.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── Parking.jsx
-│   │   │   ├── Gym.jsx
-│   │   │   ├── Healthcare.jsx
-│   │   │   ├── AQI.jsx
-│   │   │   ├── Support.jsx
-│   │   │   ├── Maintenance.jsx
-│   │   │   ├── Admin.jsx
-│   │   │   └── Profile.jsx
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx # JWT auth state
-│   │   ├── services/
-│   │   │   └── api.js          # Axios API layer
-│   │   ├── App.jsx             # Router + protected routes
-│   │   └── main.jsx
-│   └── vite.config.js         # Tailwind v4 plugin
-│
-├── backend/                   # Node.js + Express + MongoDB
+├── backend/            # Node.js + Express + MongoDB API
 │   └── src/
-│       ├── config/db.js        # MongoDB connection
-│       ├── models/             # Mongoose schemas
-│       │   ├── User.js         # SN-YYYY-XXXXX auto ID
-│       │   ├── Ticket.js
-│       │   ├── ParkingSlot.js
-│       │   ├── Gym.js
-│       │   ├── MaintenanceTask.js
-│       │   └── Announcement.js
-│       ├── controllers/        # Business logic
-│       ├── routes/             # Express routers
-│       ├── middleware/
-│       │   └── auth.js         # JWT + role guard
-│       └── server.js
-│
-├── .gitignore
+│       ├── controllers/
+│       ├── models/
+│       ├── routes/
+│       ├── utils/
+│       ├── config/
+│       ├── server.js
+│       └── seed.js     ← Run this to create test accounts!
+├── frontend/           # React + Vite PWA
+│   └── src/
+│       ├── pages/
+│       ├── components/
+│       ├── services/
+│       └── context/
+├── render.yaml         # Backend deployment (Render)
 └── README.md
 ```
 
 ---
 
-## ✨ Features
+## 🚀 Quick Start (Local Development)
 
-| Module | Description |
-|--------|------------|
-| 🔐 **Auth** | Register/Login with JWT, role-based access, unique ID (SN-2026-XXXXX) |
-| 🚗 **Smart Parking** | Real-time floor-wise slot map (H5, B7 etc.), reserve/free slots |
-| 🚴 **Gym Energy** | Live cycle occupancy + daily/monthly/yearly energy generated |
-| 🏥 **Health AI (NOVA)** | AI chatbot for wellness tips, emergency SOS button |
-| 💡 **Sensor Lights** | Floor-wise lighting status (On/Auto-dim/Off) |
-| 🌿 **AQI Tracker** | Indoor/outdoor AQI, pollutant breakdown, health tips |
-| 🚗 **Carbon Footprint** | Commute mode selector, CO₂ calculator, monthly trend |
-| ❓ **Help & Support** | 5-category ticket system with real-time status tracking |
-| 🔧 **Maintenance Panel** | Task management for maintenance staff |
-| ⚙️ **Admin Panel** | User management, ticket resolution, announcements, system status |
-| 🌿 **Plants (Promo)** | Eco awareness cards + CO₂ absorption stats |
+### Prerequisites
+- Node.js 18+
+- MongoDB Atlas account (free tier works)
+- Gmail account with [App Password](https://support.google.com/accounts/answer/185833)
+- [Google AI Studio](https://aistudio.google.com) API key (free)
+- [Cloudinary](https://cloudinary.com) account (free)
+
+### 1. Clone & Install
+
+```bash
+# Install backend deps
+cd sustainova/backend
+npm install
+
+# Install frontend deps
+cd ../frontend
+npm install
+```
+
+### 2. Configure Backend Environment
+
+Create `backend/.env` (copy from `.env.example`):
+
+```env
+PORT=5000
+NODE_ENV=development
+
+# MongoDB Atlas connection string
+MONGO_URI=mongodb+srv://<user>:<pass>@cluster0.xxxxx.mongodb.net/?appName=Cluster0
+
+# JWT (change in production!)
+JWT_SECRET=your_long_random_secret_here
+JWT_EXPIRES_IN=7d
+
+# Gemini AI (Google) — for NOVA Health AI chatbot
+# Get free key at: https://aistudio.google.com/apikey
+GEMINI_API_KEY=AIzaSy...
+
+# Frontend URL (for CORS)
+CLIENT_URL=http://localhost:5173
+
+# Cloudinary — for staff photos & QR code uploads
+# Get from: https://cloudinary.com/console
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# Email — Gmail with App Password (NOT your real password)
+# App Password: https://myaccount.google.com → Security → 2FA → App Passwords
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=xxxx xxxx xxxx xxxx
+EMAIL_FROM=noreply@sustainova.in
+```
+
+### 3. Seed the Database
+
+```bash
+cd backend
+node src/seed.js
+```
+
+This creates test accounts:
+
+| Role | Email | Password |
+|------|-------|----------|
+| 👑 **Admin** | `admin@sustainova.in` | `Admin@2026` |
+| 👤 **Employee** | `varun@sustainova.in` | `Employee@2026` |
+| 🔧 **Maintenance** | `raju@sustainova.in` | `Maintain@2026` |
+
+Also creates:
+- ✅ **Staff Gate Pass** for Raju Kumar (`STGP-XXXXXX`)
+- ✅ **Visitor Gate Pass** for Aditya Shah → Varun (valid 3 hours)
+
+### 4. Run Everything
+
+```bash
+# Terminal 1 — Backend
+cd backend
+npm run dev      # starts on http://localhost:5000
+
+# Terminal 2 — Frontend
+cd frontend
+npm run dev      # starts on http://localhost:5173
+```
 
 ---
 
-## 👥 User Roles
+## 🔑 User Roles & Access
 
-| Role | Access |
-|------|--------|
-| 🟢 **Employee** | Dashboard, Parking, Gym, Healthcare, AQI, Support, Profile |
-| 🔴 **Admin** | Everything + Admin Panel + User Management |
-| 🟡 **Maintenance** | Dashboard + Maintenance Panel + Support |
-| 🔵 **Visitor** | Limited public view |
+| Role | How to Get Account | Panel |
+|------|-------------------|-------|
+| **Employee** | Self-register at `/login` | Dashboard, Parking, Gym, AQI, Health AI, Support |
+| **Admin** | Created by seeding DB | All above + Admin Panel (Gate Passes, Users, Tickets, Announcements) |
+| **Maintenance** | Admin creates via Admin → Gate Passes → Staff Accounts | Maintenance panel + Staff Gate Pass |
+| **Visitor** | Admin creates a gate pass → email sent with QR | Public gate pass page only (`/gate-pass/:code`) |
 
 ---
 
-## 🛠️ Tech Stack
+## 📱 Key Features
 
-### Frontend
-| Tech | Version | Use |
-|------|---------|-----|
-| React | 19 | UI framework |
-| Vite | 7 | Build tool |
-| **Tailwind CSS v4** | 4.x | Styling (new @tailwindcss/vite plugin) |
-| React Router DOM | 7 | Client-side routing |
-| Recharts | 2 | Charts & graphs |
-| Axios | 1 | HTTP client |
-| Lucide React | latest | Icons |
+### 🚗 Smart Parking
+- Real-time slot map by floor (B1, B2, G, 1–5)
+- Reserve / free with 1 click
+- Traffic charts (entry/exit by hour)
+- Admin can seed parking slots
 
-### Backend
-| Tech | Version | Use |
-|------|---------|-----|
-| Node.js | 22 | Runtime |
-| Express | 5 | Web framework |
-| MongoDB | - | Database |
-| Mongoose | 8 | ODM |
-| JWT (jsonwebtoken) | - | Authentication |
-| bcryptjs | - | Password hashing |
-| Morgan | - | HTTP logging |
-| dotenv | - | Environment variables |
+### 🚴 Gym Energy
+- Live cycle occupancy tracking
+- Energy generated leaderboard
+- Weekly generation chart (kWh)
+- Admin can seed 40 cycles
+
+### 🌿 AQI Monitor
+- Indoor/outdoor air quality cards
+- CO2, PM2.5, TVOC, humidity levels
+- Mode recommendations (Fresh Air, Recirculation, etc.)
+- Building-wide AQI status badge in navbar
+
+### 🤖 NOVA Health AI (Gemini)
+- Powered by **Gemini 2.0 Flash**
+- Voice input (STT) via Web Speech API
+- Read aloud responses (TTS) via Web Speech API
+- **Languages**: English, हिंदी (Hindi), मराठी (Marathi)
+- Quick topic pills: Headache, Eye Strain, Back Pain, Stress, etc.
+- Emergency contacts, daily wellness tip
+- Chat history preserved within session
+
+> ⚠️ **Add your Gemini API key** in `backend/.env`:  
+> `GEMINI_API_KEY=AIzaSy...`  
+> Get a free key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+
+### 🪪 Gate Pass System
+
+#### Visitor Gate Passes (Admin → Gate Passes tab)
+1. Admin fills: visitor name, email, company, purpose, host, validity, authorized floors
+2. System generates QR code, uploads to Cloudinary
+3. Email sent to visitor with gate pass link
+4. Visitor opens `/gate-pass/VSGP-XXXXXX` — shows QR code, details, status
+5. Security scans QR to verify entry
+6. Admin can revoke at any time
+
+#### Staff Gate Passes (Admin → Gate Passes → Staff Accounts)
+1. Admin fills: name, email, department, floor + uploads photo
+2. System creates `maintenance` user account with auto-generated password
+3. Staff Gate Pass created with photo, QR code
+4. Welcome email sent with credentials + pass link
+
+### 🎫 Support Tickets
+- Submit tickets by category (Parking, HVAC, Electrical, Cleaning, IT, Other)
+- Track status: Open → In Progress → Resolved
+- Admin manages all tickets
+
+### 📢 Announcements
+- Admin posts announcements targeting: All, Employees, Maintenance, or Admin
+- Appears on dashboard and announcements page
+
+### 👤 Profile
+- View your building ID (`SN-2026-XXXXX`)
+- Department, floor, role
+- Carbon footprint tracker (coming soon)
+
+---
+
+## 🎨 UI Design
+
+- **Desktop**: Top navbar with text links + teal underline on active, right actions (AQI badge, theme toggle, notifications, user chip, logout) + dark footer
+- **Mobile**: Sticky header + bottom nav (5 items: Home, Parking, Gym, Health, More) + smooth slide-up "More" drawer
+- **Design System**: Custom CSS with `--sn-*` tokens, dark/light theme toggle built-in
+- **Fonts**: Inter (body) + Space Grotesk (headings)
+- **Colors**: Deep navy `#0A1628`, teal accent `#00C9B1`
+
+---
+
+## 🌐 Testing Gate Passes
+
+After seeding, check the gate pass URLs printed in terminal:
+
+```
+# Visitor pass
+http://localhost:5173/gate-pass/VSGP-XXXXXX
+
+# Staff pass
+http://localhost:5173/gate-pass/STGP-XXXXXX
+```
+
+Also available via API (no auth needed):
+```
+GET /api/gate-pass/visitor/verify/:code
+GET /api/gate-pass/staff/verify/:code
+```
+
+---
+
+## 🚢 Deployment
+
+### Backend → Render
+
+1. Push code to GitHub
+2. Go to [render.com](https://render.com) → New Web Service → Connect repo
+3. Root directory: `backend`
+4. Build command: `npm install`
+5. Start command: `npm start`
+6. Add all env vars from `.env` in Render dashboard
+
+### Frontend → Vercel
+
+1. Go to [vercel.com](https://vercel.com) → New Project → Import repo
+2. Root directory: `frontend`
+3. Framework: Vite
+4. Add env var: `VITE_API_URL=https://your-render-backend.onrender.com/api`
+5. Deploy
 
 ---
 
 ## 🔌 API Endpoints
 
-### Auth
-```
-POST /api/auth/register     Register new user
-POST /api/auth/login        Login → returns JWT token
-GET  /api/auth/me           Get current user (protected)
-POST /api/auth/logout       Logout
-```
-
-### Users (Admin)
-```
-GET    /api/users           Get all users
-GET    /api/users/:id       Get user by ID
-PUT    /api/users/:id       Update user
-DELETE /api/users/:id       Deactivate user
-```
-
-### Tickets
-```
-GET  /api/tickets           Get tickets (own or all for admin)
-POST /api/tickets           Create ticket
-PUT  /api/tickets/:id       Update ticket status / assign
-GET  /api/tickets/stats     Ticket statistics (admin)
-```
-
-### Parking
-```
-GET    /api/parking         Get all slots (filter by ?floor=B1)
-GET    /api/parking/stats   Summary stats
-POST   /api/parking/seed    Seed initial data (admin)
-POST   /api/parking/:id/reserve   Reserve a slot
-DELETE /api/parking/:id/reserve   Free a slot
-```
-
-### Gym
-```
-GET   /api/gym/cycles           Live cycle status (auto-seeds 40 cycles)
-PATCH /api/gym/cycles/:cycleId  Update cycle (IoT feed)
-GET   /api/gym/energy           Energy stats + monthly chart
-```
-
-### Maintenance
-```
-GET /api/maintenance        Get tasks
-POST /api/maintenance       Create task
-PUT  /api/maintenance/:id   Update task status
-```
-
-### Announcements
-```
-GET    /api/announcements       Get announcements (filtered by role)
-POST   /api/announcements       Create (admin)
-DELETE /api/announcements/:id   Delete (admin)
-```
+| Group | Endpoints |
+|-------|-----------|
+| Auth | `POST /api/auth/login`, `POST /api/auth/register` |
+| Parking | `GET /api/parking/stats`, `GET /api/parking/slots`, `POST /api/parking/reserve/:id`, `POST /api/parking/free/:id`, `POST /api/parking/seed` |
+| Gym | `GET /api/gym/cycles`, `POST /api/gym/seed`, `PUT /api/gym/cycle/:id/toggle`, `GET /api/gym/stats` |
+| AQI | `GET /api/aqi` (static for now) |
+| Health AI | `POST /api/healthcare/chat`, `GET /api/healthcare/tip` |
+| Tickets | `GET /api/tickets`, `POST /api/tickets`, `PATCH /api/tickets/:id/status` |
+| Announcements | `GET /api/announcements`, `POST /api/announcements` |
+| Gate Passes | `POST /api/gate-pass/visitor`, `GET /api/gate-pass/visitor`, `DELETE /api/gate-pass/visitor/:id`, `POST /api/gate-pass/staff`, `GET /api/gate-pass/staff`, `GET /api/gate-pass/visitor/verify/:code` (public), `GET /api/gate-pass/staff/verify/:code` (public) |
+| Users | `GET /api/users` (admin only) |
 
 ---
 
-## 🧪 Testing with Postman
+## 🧪 Testing Checklist
 
-See `POSTMAN_COLLECTION.md` for the complete Postman collection with all endpoints, example bodies, and auth setup.
-
-### Quick test:
-```bash
-# 1. Register
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Varun Rahatgaonkar","email":"varun@gmail.com","password":"test123","role":"employee","department":"IT"}'
-
-# 2. Login → copy token
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"varun@gmail.com","password":"test123"}'
-
-# 3. Get parking stats (with token)
-curl http://localhost:5000/api/parking/stats \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
-```
+- [ ] Login with `admin@sustainova.in` / `Admin@2026`
+- [ ] View Dashboard — AQI badge in navbar, stat cards, energy chart
+- [ ] Theme toggle (dark ↔ light) — top right
+- [ ] **Parking** — Reserve slot B1-A01, then free it
+- [ ] **Gym** — Toggle a cycle on/off
+- [ ] **Health AI** — Ask "I have a headache", try voice mic, switch language to हिंदी
+- [ ] **Admin → Gate Passes** — Create a visitor pass (use your own email to get the email)
+- [ ] Open the gate pass URL from the email or terminal seed output
+- [ ] **Admin → Gate Passes → Staff** — Create maintenance user
+- [ ] Login with `raju@sustainova.in` / `Maintain@2026`
+- [ ] Check maintenance-specific nav items
 
 ---
 
-## 🌍 Environment Variables
+## 📦 Tech Stack
 
-### Backend `.env`
-```env
-PORT=5000
-NODE_ENV=development
-MONGO_URI=mongodb+srv://USER:PASS@cluster.mongodb.net/sustainova
-JWT_SECRET=your_super_secret_key
-JWT_EXPIRES_IN=7d
-CLIENT_URL=http://localhost:5173
-GROK_API_KEY=your_grok_api_key   # for Healthcare AI (optional)
-```
-
-### Frontend `.env`
-```env
-VITE_API_URL=http://localhost:5000/api
-```
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite, React Router v6, Recharts |
+| Styling | Vanilla CSS with CSS custom properties |
+| Backend | Node.js, Express.js |
+| Database | MongoDB Atlas + Mongoose |
+| AI | Google Gemini 2.0 Flash (`@google/generative-ai`) |
+| Auth | JWT (jsonwebtoken + bcryptjs) |
+| Media | Cloudinary (photos + QR codes) |
+| Email | Nodemailer (Gmail SMTP) |
+| QR Codes | `qrcode` npm package |
+| Voice | Web Speech API (SpeechRecognition + SpeechSynthesis) |
+| Deploy | Render (backend) + Vercel (frontend) |
 
 ---
 
-## 🚀 Deployment
-
-```bash
-# Build frontend
-cd frontend && npm run build
-
-# Deploy backend (e.g. Railway / Render)
-# Set environment variables in dashboard
-# Point MONGO_URI to MongoDB Atlas
-
-# Frontend → Vercel / Netlify
-# vercel --prod
-```
-
----
-
-## 📦 Future Enhancements
-
-- [ ] Real IoT integration (MQTT → WebSocket → React)
-- [ ] Grok AI real API integration for healthcare chatbot
-- [ ] Three.js 3D building model viewer
-- [ ] Push notifications (PWA)
-- [ ] Firebase Cloud Messaging
-- [ ] Real-time WebSocket updates for parking & gym
-
----
-
-*SUSTAINOVA · Solar Decathlon India 2026 · VESCOA Architecture + VESIT IT*
+*Built for Solar Decathlon India 2026 · VESCOA + VESIT · TATA Realty*

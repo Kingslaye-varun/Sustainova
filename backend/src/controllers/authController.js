@@ -9,21 +9,28 @@ const generateToken = (user) => {
     );
 };
 
-// POST /api/auth/register
+// POST /api/auth/register  — EMPLOYEES ONLY
 const register = async (req, res) => {
     try {
-        const { name, email, password, role, department, floor } = req.body;
-        console.log(`📝 Register attempt: ${email}, role: ${role || 'employee'}`);
+        const { name, email, password, department, floor } = req.body;
+        console.log(`📝 Register attempt: ${email} (locked to employee role)`);
 
         const existing = await User.findOne({ email });
         if (existing) {
             return res.status(400).json({ success: false, message: 'Email already registered' });
         }
 
-        const user = await User.create({ name, email, password, role, department, floor });
+        // ⚠️ Role is ALWAYS 'employee' for public registration.
+        // Admin/Maintenance/Visitor are created by Admin only.
+        const user = await User.create({
+            name, email, password,
+            role: 'employee',
+            department: department || 'General',
+            floor: parseInt(floor) || 1,
+        });
         const token = generateToken(user);
 
-        console.log(`✅ User registered: ${user.userId} (${user.name})`);
+        console.log(`✅ Employee registered: ${user.userId} (${user.name})`);
         res.status(201).json({
             success: true,
             message: 'Registration successful',
@@ -38,6 +45,8 @@ const register = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+
 
 // POST /api/auth/login
 const login = async (req, res) => {

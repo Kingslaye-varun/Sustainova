@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Button, Input, Textarea, Select, PageHeader, StatusChip, Badge, TabRow, EmptyState, Spinner } from '../components/ui';
+import { Card, Button, Input, Textarea, Select, PageHeader, StatusChip, Badge, TabRow, Spinner, EmptyState } from '../components/ui';
 import Layout from '../components/layout/Layout';
 import { ticketAPI } from '../services/api';
 
@@ -42,9 +42,8 @@ const Support = () => {
             setForm({ title: '', description: '', priority: 'medium', location: '' });
             setSelectedCat(null);
             setTimeout(() => setSuccess(''), 5000);
-        } catch (e) {
-            console.error('Ticket create error:', e.response?.data);
-        } finally { setSubmitting(false); }
+        } catch (e) { console.error(e.response?.data); }
+        finally { setSubmitting(false); }
     };
 
     const PRIORITY_COLOR = { low: 'green', medium: 'teal', high: 'gold', critical: 'red' };
@@ -57,19 +56,30 @@ const Support = () => {
 
             {tab === 'new' && (
                 <form onSubmit={submit}>
-                    <h3 className="font-['Space_Grotesk'] font-semibold mb-3">Select Category</h3>
-                    <div className="flex flex-col gap-2 mb-4">
+                    <p className="sn-section-title">Select Category</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
                         {CATEGORIES.map(c => (
-                            <div key={c.id} onClick={() => setSelectedCat(c.id)}
-                                className={`flex items-center gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition-all ${selectedCat === c.id ? 'border-[#00C9B1] bg-[rgba(0,201,177,0.06)]' : 'border-[rgba(0,201,177,0.12)] bg-[#132845] hover:border-[rgba(0,201,177,0.25)]'}`}>
-                                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style={{ background: `${c.color}15`, border: `1px solid ${c.color}40` }}>
+                            <div
+                                key={c.id}
+                                onClick={() => setSelectedCat(c.id)}
+                                className={`sn-category-card ${selectedCat === c.id ? 'sn-category-card--active' : ''}`}
+                            >
+                                <div style={{
+                                    width: 40, height: 40,
+                                    borderRadius: '0.625rem',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: '1.25rem',
+                                    background: `${c.color}18`,
+                                    border: `1px solid ${c.color}45`,
+                                    flexShrink: 0,
+                                }}>
                                     {c.icon}
                                 </div>
-                                <div className="flex-1">
-                                    <div className="font-semibold text-sm">{c.label}</div>
-                                    <div className="text-xs text-[#4A6580]">{c.desc}</div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{c.label}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--sn-dim)' }}>{c.desc}</div>
                                 </div>
-                                {selectedCat === c.id && <span style={{ color: c.color }}>✓</span>}
+                                {selectedCat === c.id && <span style={{ color: c.color, fontWeight: 700 }}>✓</span>}
                             </div>
                         ))}
                     </div>
@@ -84,7 +94,7 @@ const Support = () => {
                         <option value="critical">Critical</option>
                     </Select>
 
-                    {success && <div className="bg-[rgba(46,204,113,0.1)] border border-[rgba(46,204,113,0.3)] text-[#2ECC71] text-sm rounded-xl px-4 py-3 mb-4">{success}</div>}
+                    {success && <div className="sn-alert-success">{success}</div>}
 
                     <Button type="submit" fullWidth size="lg" disabled={submitting || !selectedCat}>
                         {submitting ? <Spinner size="sm" /> : '🚀 Submit Ticket'}
@@ -94,22 +104,24 @@ const Support = () => {
 
             {tab === 'mine' && (
                 loading ? (
-                    <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0' }}><Spinner size="lg" /></div>
                 ) : tickets.length === 0 ? (
                     <EmptyState icon="🎫" message="No tickets yet. Raise one if you need help!" />
                 ) : (
-                    <div className="flex flex-col gap-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         {tickets.map(t => (
                             <Card key={t._id}>
-                                <div className="flex items-center justify-between mb-2">
-                                    <Badge variant="teal" className="text-xs">{t.ticketId}</Badge>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                    <Badge variant="teal">{t.ticketId}</Badge>
                                     <StatusChip status={t.status} />
                                 </div>
-                                <p className="font-semibold text-sm mb-1">{t.title}</p>
-                                <p className="text-xs text-[#4A6580] mb-2">{t.location} · {new Date(t.createdAt).toLocaleDateString('en-IN')}</p>
-                                <div className="flex items-center gap-3 text-xs text-[#8BA3B8]">
+                                <p style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{t.title}</p>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--sn-dim)', marginBottom: '0.5rem' }}>
+                                    {t.location} · {new Date(t.createdAt).toLocaleDateString('en-IN')}
+                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.75rem', color: 'var(--sn-muted)' }}>
                                     <span>🏷️ {t.category}</span>
-                                    <Badge variant={PRIORITY_COLOR[t.priority] || 'teal'} className="text-xs">{t.priority}</Badge>
+                                    <Badge variant={PRIORITY_COLOR[t.priority] || 'teal'}>{t.priority}</Badge>
                                     <span>👤 {t.assignedTo?.name || 'Pending'}</span>
                                 </div>
                             </Card>

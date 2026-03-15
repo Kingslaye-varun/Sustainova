@@ -1,9 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_API_URL || '/api',
     headers: { 'Content-Type': 'application/json' },
 });
+
 
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
@@ -79,4 +80,27 @@ export const announcementAPI = {
     delete: (id) => api.delete(`/announcements/${id}`),
 };
 
+// ── Gate Passes ──
+export const gatePassAPI = {
+    // Visitor
+    createVisitor: (data) => api.post('/gate-pass/visitor', data),
+    listVisitors:  (params) => api.get('/gate-pass/visitor', { params }),
+    revokeVisitor: (id) => api.delete(`/gate-pass/visitor/${id}`),
+    verifyVisitor: (code) => api.get(`/gate-pass/visitor/verify/${code}`),
+
+    // Staff (maintenance)
+    createStaffUser: (formData) => api.post('/gate-pass/staff/create-staff', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+    listStaff:  () => api.get('/gate-pass/staff'),
+    verifyStaff: (code) => api.get(`/gate-pass/staff/verify/${code}`),
+};
+
+// ── Healthcare (Gemini / NOVA AI) ──
+export const healthcareAPI = {
+    chat:   (data) => api.post('/healthcare/chat', data),
+    getDailyTip: () => api.get('/healthcare/tip'),
+};
+
 export default api;
+

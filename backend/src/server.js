@@ -11,7 +11,11 @@ connectDB();
 
 // ── Middleware ──
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: (origin, cb) => {
+        const allowed = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map(s => s.trim());
+        if (!origin || allowed.includes(origin)) return cb(null, true);
+        cb(new Error('Not allowed by CORS'));
+    },
     credentials: true,
 }));
 app.use(express.json());
@@ -30,13 +34,16 @@ app.get('/api/health', (req, res) => {
 });
 
 // ── Routes ──
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/tickets', require('./routes/tickets'));
-app.use('/api/parking', require('./routes/parking'));
-app.use('/api/gym', require('./routes/gym'));
-app.use('/api/maintenance', require('./routes/maintenance'));
+app.use('/api/auth',          require('./routes/auth'));
+app.use('/api/users',         require('./routes/users'));
+app.use('/api/tickets',       require('./routes/tickets'));
+app.use('/api/parking',       require('./routes/parking'));
+app.use('/api/gym',           require('./routes/gym'));
+app.use('/api/maintenance',   require('./routes/maintenance'));
 app.use('/api/announcements', require('./routes/announcements'));
+app.use('/api/gate-pass',     require('./routes/gatePass'));
+app.use('/api/healthcare',    require('./routes/healthcare'));
+
 
 // ── 404 handler ──
 app.use((req, res) => {

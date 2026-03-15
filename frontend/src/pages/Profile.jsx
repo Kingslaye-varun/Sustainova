@@ -9,40 +9,78 @@ const Profile = () => {
     const initials = user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
     const ROLE_COLOR = { admin: 'gold', employee: 'teal', maintenance: 'red', visitor: 'purple' };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+    const handleLogout = () => { logout(); navigate('/login'); };
 
     return (
         <Layout>
             <PageHeader label="👤 My Profile" title={user?.name || 'User'} subtitle={`ID: ${user?.userId || '—'}`} />
 
-            <Card className="text-center mb-4 py-6">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00C9B1] to-[#00A896] flex items-center justify-center text-[#0A1628] text-2xl font-bold mx-auto mb-3">
+            {/* Avatar card */}
+            <Card style={{ textAlign: 'center', marginBottom: '1rem', padding: '1.5rem 1rem' }}>
+                <div className="sn-avatar sn-avatar--lg" style={{ margin: '0 auto 0.875rem' }}>
                     {initials}
                 </div>
-                <Badge variant={ROLE_COLOR[user?.role] || 'teal'} className="mb-2">{user?.role}</Badge>
-                <p className="text-[#8BA3B8] text-sm">{user?.department} · Floor {user?.floor}</p>
-                <div className="mt-4 bg-[#0d1e35] rounded-2xl p-4">
-                    <p className="text-[10px] text-[#4A6580] uppercase tracking-wider mb-1">Your Unique Building ID</p>
-                    <p className="font-['Space_Grotesk'] text-xl font-bold text-[#00C9B1] tracking-widest">{user?.userId || '—'}</p>
+                <Badge variant={ROLE_COLOR[user?.role] || 'teal'} style={{ marginBottom: '0.5rem' }}>
+                    {user?.role}
+                </Badge>
+                <p style={{ color: 'var(--sn-muted)', fontSize: '0.875rem', marginTop: '0.375rem' }}>
+                    {user?.department} · Floor {user?.floor}
+                </p>
+
+                {/* Building ID */}
+                <div style={{
+                    marginTop: '1rem',
+                    background: 'var(--sn-dark)',
+                    borderRadius: '0.75rem',
+                    padding: '0.875rem',
+                }}>
+                    <p style={{ fontSize: '0.625rem', color: 'var(--sn-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.375rem' }}>
+                        Your Unique Building ID
+                    </p>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', fontWeight: 700, color: 'var(--sn-teal)', letterSpacing: '0.12em' }}>
+                        {user?.userId || '—'}
+                    </p>
                 </div>
             </Card>
 
-            <Card className="mb-4">
-                <h3 className="font-['Space_Grotesk'] font-semibold mb-3">🌍 My Carbon This Month</h3>
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-[#8BA3B8] text-sm">Total CO₂ emitted</span>
-                    <span className="font-semibold text-[#2ECC71]">12.4 kg</span>
+            {/* Carbon card */}
+            <Card style={{ marginBottom: '1rem' }}>
+                <p className="sn-section-title">🌍 My Carbon This Month</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span style={{ color: 'var(--sn-muted)', fontSize: '0.875rem' }}>Total CO₂ emitted</span>
+                    <span style={{ fontWeight: 600, color: 'var(--sn-green)' }}>12.4 kg</span>
                 </div>
-                <div className="h-1.5 bg-[#0d1e35] rounded-full overflow-hidden mb-2">
-                    <div className="h-full w-[30%] bg-gradient-to-r from-[#00C9B1] to-[#00A896] rounded-full" />
+                <div className="sn-progress">
+                    <div className="sn-progress__fill" style={{ width: '30%' }} />
                 </div>
-                <p className="text-xs text-[#4A6580]">You're in the top 30% of low-carbon commuters 🎉</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--sn-dim)' }}>You're in the top 30% of low-carbon commuters 🎉</p>
             </Card>
 
-            <Button variant="outline" fullWidth size="lg" onClick={handleLogout}>🚪 Logout</Button>
+            {/* Account info */}
+            <Card style={{ marginBottom: '1rem' }}>
+                <p className="sn-section-title">📧 Account Details</p>
+                {[
+                    { label: 'Email', value: user?.email || '—' },
+                    { label: 'Department', value: user?.department || '—' },
+                    { label: 'Floor', value: user?.floor || '—' },
+                    { label: 'Role', value: user?.role || '—' },
+                ].map(({ label, value }) => (
+                    <div key={label} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '0.625rem 0',
+                        borderBottom: '1px solid rgba(0,201,177,0.08)',
+                    }}>
+                        <span style={{ fontSize: '0.8125rem', color: 'var(--sn-muted)' }}>{label}</span>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{value}</span>
+                    </div>
+                ))}
+            </Card>
+
+            <Button variant="ghost" fullWidth size="lg" onClick={handleLogout}>
+                🚪 Sign Out
+            </Button>
         </Layout>
     );
 };
