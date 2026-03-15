@@ -18,6 +18,8 @@ services:
         sync: false           # Set this in Render dashboard — never commit to git
       - key: JWT_SECRET
         sync: false
+      - key: GEMINI_API_KEY
+        sync: false
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: CLIENT_URL
