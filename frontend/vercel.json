@@ -7,6 +7,6 @@
   "installCommand": "npm install",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "https://sustainova-backend.onrender.com/api"
+    "VITE_API_URL": "https://sustainova.onrender.com/api"
   }
 }

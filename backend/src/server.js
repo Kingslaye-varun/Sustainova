@@ -10,13 +10,18 @@ const app = express();
 connectDB();
 
 // ── Middleware ──
+// Temporary: Force allow all origins to confirm if the manual validation logic was causing the missing header
 app.use(cors({
     origin: (origin, cb) => {
-        const allowed = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map(s => s.trim());
-        if (!origin || allowed.includes(origin)) return cb(null, true);
-        cb(new Error('Not allowed by CORS'));
+        // Log every incoming origin to Render logs for debugging
+        console.log(`🌐 Incoming Request Origin: ${origin || 'No Origin (Check if direct IP/cURL)'}`);
+        
+        // Always allow for now to fix the blocking issue immediately
+        cb(null, true);
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
